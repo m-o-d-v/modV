@@ -15,6 +15,9 @@
               <gl-component title="Groups" :closable="false">
                 <Groups />
               </gl-component>
+              <gl-component title="Input Mapping" :closable="false">
+                <InputMapping />
+              </gl-component>
             </gl-stack>
           </gl-col>
           <gl-col :width="33" :closable="false" ref="rightColumn">
@@ -97,6 +100,7 @@ import StatusBar from "@/components/StatusBar";
 import ModuleInspector from "@/components/ModuleInspector";
 import InfoView from "@/components/InfoView";
 import Search from "@/components/Search";
+import InputMapping from "@/components/InputMapping";
 
 import * as GoldenLayout from "golden-layout";
 
@@ -120,7 +124,8 @@ export default {
     StatusBar,
     InfoView,
     ModuleInspector,
-    Search
+    Search,
+    InputMapping
   },
 
   data() {
