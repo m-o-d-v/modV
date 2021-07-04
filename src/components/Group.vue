@@ -187,56 +187,54 @@
         v-show="lastFocusedGroup"
         title="Focused Group"
       ></figure>
-      <Container
-        drag-handle-selector=".handle"
-        orientation="horizontal"
-        group-name="modules"
-        :should-animate-drop="() => false"
-        :get-child-payload="getChildPayload"
-        tag="div"
+
+      <DropList
+        :items="modules"
         class="group__modules"
-        @drop="onDrop"
+        @insert="onDrop"
+        @reorder="$event.apply(modules)"
+        :row="true"
       >
-        <Draggable
-          v-for="moduleId in modules"
-          :key="moduleId"
-          class="group__module"
-        >
-          <div class="group-module-container">
-            <ActiveModule :id="moduleId" @remove-module="removeModule" />
-          </div>
-        </Draggable>
-      </Container>
+        <template v-slot:item="{ item }" class="group-module-container">
+          <drag class="item" :key="item">
+            <ActiveModule :id="item" @remove-module="removeModule" />
+          </drag>
+        </template>
+
+        <template v-slot:feedback="{ data }">
+          <div class="item feedback" :key="data.name">{{ data.name }}</div>
+        </template>
+      </DropList>
     </div>
   </div>
 </template>
 
 <script>
-import { Container, Draggable } from "vue-smooth-dnd";
+import { Drag, DropList } from "vue-easy-dnd";
 import constants from "../application/constants";
 import ActiveModule from "./ActiveModule";
 import compositeOperations from "../util/composite-operations";
 import Arrow from "../assets/graphics/Arrow.svg";
 
-const applyDrag = (arr, dragResult) => {
-  const { removedIndex, addedIndex, payload } = dragResult;
-  if (removedIndex === null && addedIndex === null) {
-    return arr;
-  }
+// const applyDrag = (arr, dragResult) => {
+//   const { removedIndex, addedIndex, payload } = dragResult;
+//   if (removedIndex === null && addedIndex === null) {
+//     return arr;
+//   }
 
-  const result = [...arr];
-  let itemToAdd = payload;
+//   const result = [...arr];
+//   let itemToAdd = payload;
 
-  if (removedIndex !== null) {
-    itemToAdd = result.splice(removedIndex, 1)[0];
-  }
+//   if (removedIndex !== null) {
+//     itemToAdd = result.splice(removedIndex, 1)[0];
+//   }
 
-  if (addedIndex !== null) {
-    result.splice(addedIndex, 0, itemToAdd);
-  }
+//   if (addedIndex !== null) {
+//     result.splice(addedIndex, 0, itemToAdd);
+//   }
 
-  return result;
-};
+//   return result;
+// };
 
 export default {
   props: {
@@ -248,8 +246,8 @@ export default {
 
   components: {
     ActiveModule,
-    Container,
-    Draggable
+    Drag,
+    DropList
   },
 
   data() {
@@ -410,27 +408,27 @@ export default {
 
   methods: {
     async onDrop(e) {
-      const { moduleName, collection } = e.payload;
+      const { index, data } = e;
 
-      if (e.addedIndex === null && e.removedIndex === null) {
-        return;
-      }
+      // if (e.addedIndex === null && e.removedIndex === null) {
+      //   return;
+      // }
 
-      if (collection === "gallery") {
-        const module = await this.$modV.store.dispatch(
-          "modules/makeActiveModule",
-          { moduleName }
-        );
+      // if (collection === "gallery") {
+      const module = await this.$modV.store.dispatch(
+        "modules/makeActiveModule",
+        { moduleName: data.name }
+      );
 
-        this.$modV.store.commit("groups/ADD_MODULE_TO_GROUP", {
-          moduleId: module.$id,
-          groupId: this.groupId,
-          position: e.addedIndex
-        });
-      } else if (collection === "layer") {
-        e.payload = e.payload.moduleId;
-        this.modules = applyDrag(this.modules, e);
-      }
+      this.$modV.store.commit("groups/ADD_MODULE_TO_GROUP", {
+        moduleId: module.$id,
+        groupId: this.groupId,
+        position: index
+      });
+      // } else if (collection === "layer") {
+      //   e.payload = e.payload.moduleId;
+      //   this.modules = applyDrag(this.modules, e);
+      // }
     },
 
     getChildPayload(e) {

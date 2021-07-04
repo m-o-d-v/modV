@@ -26,18 +26,11 @@
             v-show="renderersToShow.indexOf(renderer) > -1"
           >
             <div class="title">{{ renderer }}</div>
-            <Container
-              behaviour="copy"
-              group-name="modules"
-              :get-child-payload="
-                e => getChildPayload('modulesByRenderer', e, renderer)
-              "
-              class="fluid"
-            >
-              <Draggable
+            <div class="fluid">
+              <Drag
                 v-for="(module, name) in modules"
                 :key="name"
-                ghost-class="ghost"
+                :data="{ name: module.meta.name }"
                 v-show="modulesToShow.indexOf(name) > -1"
                 tabindex="0"
                 @keydown.native.enter="addModuleToFocusedGroup(module)"
@@ -53,8 +46,8 @@
                     type: 'Module'
                   }"
                 />
-              </Draggable>
-            </Container>
+              </Drag>
+            </div>
           </c>
 
           <c span="1.." v-show="!renderersToShow.length && searchTerm.length">
@@ -67,14 +60,14 @@
 </template>
 
 <script>
-import { Container, Draggable } from "vue-smooth-dnd";
+import { Drag } from "vue-easy-dnd";
+
 import constants from "../application/constants";
 import GalleryItem from "./GalleryItem";
 
 export default {
   components: {
-    Container,
-    Draggable,
+    Drag,
     GalleryItem
   },
 

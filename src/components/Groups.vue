@@ -8,53 +8,51 @@
       type: 'Panel'
     }"
   >
-    <Container
-      drag-handle-selector=".group__title"
-      lock-axis="y"
-      group-name="groups"
-      :should-animate-drop="() => false"
-      tag="c"
-      span="1.."
-      class="group-container"
-      @drop="onDrop"
+    <DropList
+      :items="groups"
+      @reorder="$event.apply(groups)"
+      :no-animations="true"
+      :column="true"
     >
-      <Draggable v-for="group in groups" :key="group.id">
-        <Group :groupId="group.id" />
-      </Draggable>
-    </Container>
+      <template v-slot:item="{ item }" class="group-module-container">
+        <drag class="item" :key="item">
+          <Group :groupId="item.id" />
+        </drag>
+      </template>
+    </DropList>
 
     <Button class="light" @click="createGroup">New Group</Button>
   </div>
 </template>
 
 <script>
-import { Container, Draggable } from "vue-smooth-dnd";
+import { Drag, DropList } from "vue-easy-dnd";
 import Group from "./Group";
 
-const applyDrag = (arr, dragResult) => {
-  const { removedIndex, addedIndex, payload } = dragResult;
-  if (removedIndex === null && addedIndex === null) {
-    return arr;
-  }
+// const applyDrag = (arr, dragResult) => {
+//   const { removedIndex, addedIndex, payload } = dragResult;
+//   if (removedIndex === null && addedIndex === null) {
+//     return arr;
+//   }
 
-  const result = [...arr];
-  let itemToAdd = payload;
+//   const result = [...arr];
+//   let itemToAdd = payload;
 
-  if (removedIndex !== null) {
-    itemToAdd = result.splice(removedIndex, 1)[0];
-  }
+//   if (removedIndex !== null) {
+//     itemToAdd = result.splice(removedIndex, 1)[0];
+//   }
 
-  if (addedIndex !== null) {
-    result.splice(addedIndex, 0, itemToAdd);
-  }
+//   if (addedIndex !== null) {
+//     result.splice(addedIndex, 0, itemToAdd);
+//   }
 
-  return result;
-};
+//   return result;
+// };
 
 export default {
   components: {
-    Container,
-    Draggable,
+    Drag,
+    DropList,
     Group
   },
 
@@ -91,11 +89,11 @@ export default {
   methods: {
     async createGroup() {
       this.$modV.store.dispatch("groups/createGroup");
-    },
-
-    onDrop(e) {
-      this.groups = applyDrag(this.groups, e);
     }
+
+    // onDrop(e) {
+    //   this.groups = applyDrag(this.groups, e);
+    // }
   }
 };
 </script>
